@@ -1,0 +1,14 @@
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.AssemblyInfoInputs.cache
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.AssemblyInfo.cs
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.csproj.CoreCompileInputs.cache
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\bin\Debug\net10.0\C-sharp-projects.exe
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\bin\Debug\net10.0\C-sharp-projects.deps.json
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\bin\Debug\net10.0\C-sharp-projects.runtimeconfig.json
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\bin\Debug\net10.0\C-sharp-projects.dll
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\bin\Debug\net10.0\C-sharp-projects.pdb
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.dll
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\refint\C-sharp-projects.dll
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.pdb
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.genruntimeconfig.cache
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\ref\C-sharp-projects.dll

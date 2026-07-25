@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ritab\\OneDrive\\Desktop\\C-sharp-projects\\C-sharp-projects.csproj": {}
+    "C:\\Users\\ritab\\OneDrive\\Desktop\\radiation_calculator_app\\C-sharp-projects.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ritab\\OneDrive\\Desktop\\C-sharp-projects\\C-sharp-projects.csproj": {
+    "C:\\Users\\ritab\\OneDrive\\Desktop\\radiation_calculator_app\\C-sharp-projects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ritab\\OneDrive\\Desktop\\C-sharp-projects\\C-sharp-projects.csproj",
+        "projectUniqueName": "C:\\Users\\ritab\\OneDrive\\Desktop\\radiation_calculator_app\\C-sharp-projects.csproj",
         "projectName": "C-sharp-projects",
-        "projectPath": "C:\\Users\\ritab\\OneDrive\\Desktop\\C-sharp-projects\\C-sharp-projects.csproj",
+        "projectPath": "C:\\Users\\ritab\\OneDrive\\Desktop\\radiation_calculator_app\\C-sharp-projects.csproj",
         "packagesPath": "C:\\Users\\ritab\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ritab\\OneDrive\\Desktop\\C-sharp-projects\\obj\\",
+        "outputPath": "C:\\Users\\ritab\\OneDrive\\Desktop\\radiation_calculator_app\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
