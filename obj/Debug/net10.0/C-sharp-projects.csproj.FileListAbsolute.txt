@@ -12,3 +12,4 @@ C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\refin
 C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.pdb
 C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.genruntimeconfig.cache
 C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\ref\C-sharp-projects.dll
+C:\Users\ritab\OneDrive\Desktop\radiation_calculator_app\obj\Debug\net10.0\C-sharp-projects.sourcelink.json
