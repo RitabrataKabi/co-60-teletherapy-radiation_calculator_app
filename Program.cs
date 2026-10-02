@@ -1,56 +1,25 @@
-﻿using System;
-using System.Numerics;
-using System.Linq;
-using System.Data;
+﻿global using static RadApp.Utilities.MakeMyLifeEasier;
 
-public static class ParsingVector2
-{
-    public static Vector2 parseToVector2(string input)
-    {
-        string newInput = input.Trim('(', '{', '[', ')', '}', ']');
-        string[] tokens = newInput.Split(new char[] { ' ', ':', ',', 'X', 'x', 'Y', 'y' }, StringSplitOptions.RemoveEmptyEntries);
-
-        Vector2 vector = Vector2.Zero;
-
-        if (tokens.Length >= 2)
-        {
-            //means vector 2 is possible
-            //also need to set a minimum value, clamping here
-            float.TryParse(tokens[0], out vector.X);
-            float.TryParse(tokens[1], out vector.Y);
-        }
-
-        return vector;
-    }
-
-}
+using System;
 
 public class Program()
 {
     static void Main(string[] arguments)
     {
-        //tackling the field size input
-        Console.WriteLine("Type in field size as (X, Y) (in cm) : ");
+        ManagerNM.Manager manager = new ManagerNM.Manager();
 
-        string inputStream = Console.ReadLine() ?? "(10, 10)";
+        //run at start of program & once
+        manager.Start();
 
-        Vector2 fieldSize = ParsingVector2.parseToVector2(inputStream);
+        while (true)
+        {
+            //run Update every cycle of the program
+            manager.Update();
 
-        //tackling depth (in cm)
-        Console.WriteLine("Type in Depth (in cm) : ");
+            //this will run as many times as physically possible by the CPU, hence will pin one CPU at 100% all the time, we do not want that, and need to target a baseline 60 cycles per sec, which comes down to 16.67 ms
+            System.Threading.Thread.Sleep(16);
+        }
 
-        float depth = 7f;
-        float.TryParse(Console.ReadLine() ?? "7", out depth);
-
-        //tackling dosage (in cGy)
-        Console.WriteLine("Type in required dosage (in cGy): ");
-
-        float dosage = 100f;
-        float.TryParse(Console.ReadLine() ?? "100", out dosage);
-
-        #region DebugLines
-        Console.WriteLine("field size (in cm) = {0}; dosage (cGy) = {1}; depth (in cm) = {2}", fieldSize, dosage, depth);
-        #endregion
 
     }
 }
