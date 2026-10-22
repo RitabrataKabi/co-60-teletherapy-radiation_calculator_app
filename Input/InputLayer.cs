@@ -54,7 +54,7 @@ namespace RadApp.Input
             #endregion
 
             //exiting the program with exit code 0, i.e. safely
-            ExitProgram();
+            System.Environment.Exit(0);
         }
     }
 }

@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Co-60 teletherapy treatment-time calculator">
+    <title>Co-60 Treatment-Time Calculator</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #172638;
+            --muted: #5f6f7f;
+            --line: #d9e1e8;
+            --paper: #f3f7f9;
+            --card: #fff;
+            --brand: #0d6d72;
+            --brand-dark: #07565a;
+            --accent: #e7f4f3;
+            --danger: #a8232d;
+            --shadow: 0 12px 28px rgba(23, 38, 56, .09);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            color: var(--ink);
+            background: linear-gradient(130deg, #e5f2f1 0, #f4f7f8 42%, #edf4f6 100%);
+            font: 16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+        }
+
+        .shell {
+            width: min(1040px, calc(100% - 32px));
+            margin: 32px auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 24px;
+            margin: 0 0 22px;
+        }
+
+        .eyebrow {
+            margin: 0 0 5px;
+            color: var(--brand);
+            font-size: .78rem;
+            font-weight: 750;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.7rem, 4vw, 2.55rem);
+            letter-spacing: -.035em;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            max-width: 650px;
+            margin: 9px 0 0;
+            color: var(--muted);
+        }
+
+        .version {
+            padding: 6px 10px;
+            border: 1px solid #bcdedc;
+            border-radius: 99px;
+            color: var(--brand-dark);
+            background: var(--accent);
+            font-size: .82rem;
+            font-weight: 650;
+            white-space: nowrap;
+        }
+
+        .notice {
+            display: flex;
+            gap: 10px;
+            padding: 13px 15px;
+            margin: 0 0 20px;
+            border-left: 4px solid #c88c26;
+            border-radius: 8px;
+            background: #fff9ee;
+            color: #624813;
+        }
+
+        .notice strong {
+            display: block;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(310px, .92fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid rgba(217, 225, 232, .9);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-panel {
+            padding: 25px;
+        }
+
+        .result-panel {
+            position: sticky;
+            top: 20px;
+            overflow: hidden;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 1.12rem;
+        }
+
+        .panel-intro {
+            margin: 5px 0 20px;
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .field.full {
+            grid-column: 1/-1;
+        }
+
+        label {
+            font-size: .87rem;
+            font-weight: 650;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #b8c5cf;
+            border-radius: 9px;
+            color: var(--ink);
+            background: #fff;
+            font: inherit;
+        }
+
+        input:focus {
+            outline: 3px solid rgba(13, 109, 114, .2);
+            border-color: var(--brand);
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: .78rem;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        button {
+            appearance: none;
+            border: 0;
+            border-radius: 9px;
+            padding: 11px 16px;
+            background: var(--brand);
+            color: white;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: var(--brand-dark);
+        }
+
+        button.secondary {
+            background: transparent;
+            border: 1px solid #b8c5cf;
+            color: var(--ink);
+        }
+
+        button.secondary:hover {
+            background: #f2f6f7;
+        }
+
+        .error {
+            min-height: 1.35em;
+            margin: 14px 0 0;
+            color: var(--danger);
+            font-size: .87rem;
+            font-weight: 600;
+        }
+
+        .result-top {
+            padding: 25px 25px 19px;
+            color: white;
+            background: linear-gradient(135deg, #0d6d72, #0b4f61);
+        }
+
+        .result-top p {
+            margin: 0;
+            opacity: .85;
+            font-size: .84rem;
+            font-weight: 650;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        .time {
+            margin: 5px 0 0;
+            font-size: clamp(2.35rem, 6vw, 3.45rem);
+            font-weight: 760;
+            letter-spacing: -.05em;
+            line-height: 1;
+        }
+
+        .seconds {
+            margin: 8px 0 0;
+            color: #d5eeee;
+        }
+
+        .placeholder {
+            padding: 25px;
+            color: var(--muted);
+        }
+
+        .results {
+            display: none;
+            padding: 7px 25px 22px;
+        }
+
+        .results.visible {
+            display: block;
+        }
+
+        dl {
+            margin: 0;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .row:last-child {
+            border-bottom: 0;
+        }
+
+        dt {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        dd {
+            margin: 0;
+            font-weight: 700;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .footnote {
+            margin: 17px 0 0;
+            color: var(--muted);
+            font-size: .78rem;
+        }
+
+        footer {
+            margin: 18px 0 0;
+            color: var(--muted);
+            font-size: .78rem;
+            text-align: center;
+        }
+
+        @media (max-width:760px) {
+            .shell {
+                width: min(100% - 22px, 620px);
+                margin: 18px auto;
+            }
+
+            header {
+                display: block;
+            }
+
+            .version {
+                display: inline-block;
+                margin-top: 14px;
+            }
+
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .result-panel {
+                position: static;
+                order: -1;
+            }
+
+            .form-panel,
+            .result-top {
+                padding: 20px;
+            }
+
+            .results,
+            .placeholder {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+
+        @media (max-width:410px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .row {
+                gap: 10px;
+            }
+
+            .row dt {
+                max-width: 58%;
+            }
+        }
+
+        @media (prefers-reduced-motion:no-preference) {
+            .panel {
+                transition: transform .18s ease, box-shadow .18s ease;
+            }
+
+            .panel:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 16px 34px rgba(23, 38, 56, .12);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="shell">
+        <header>
+            <div>
+                <p class="eyebrow">Co-60 teletherapy</p>
+                <h1>Treatment-time calculator</h1>
+                <p class="subtitle">A browser version of the supplied equivalent-square, PDD, output-calibration, and
+                    decay calculation. Note the UI is entirely AI generated.</p>
+            </div>
+            <span class="version">Standalone web tool</span>
+        </header>
+
+        <section class="notice" aria-label="Clinical safety notice">
+            <div aria-hidden="true">⚠</div>
+            <div><strong>Clinical verification required</strong>This calculation is a support tool only. Independently
+                verify all inputs and results under your department’s approved treatment protocol before use.</div>
+        </section>
+
+        <section class="workspace">
+            <form id="calculator-form" class="panel form-panel" novalidate>
+                <h2 class="panel-title">Treatment inputs</h2>
+                <p class="panel-intro">Enter the prescribed dose at the treatment depth. Values are calculated
+                    immediately when you select Calculate.</p>
+                <div class="grid">
+                    <div class="field"><label for="field-x">Field size X (cm)</label><input id="field-x" name="fieldX"
+                            type="number" min="1" max="40" step="0.1" value="10" required></div>
+                    <div class="field"><label for="field-y">Field size Y (cm)</label><input id="field-y" name="fieldY"
+                            type="number" min="1" max="40" step="0.1" value="10" required></div>
+                    <div class="field"><label for="depth">Depth (cm)</label><input id="depth" name="depth" type="number"
+                            min="0.5" max="30" step="0.1" value="7" required></div>
+                    <div class="field"><label for="dose">Prescribed dose at depth (cGy)</label><input id="dose"
+                            name="dose" type="number" min="0.001" step="0.01" value="100" required></div>
+                    <div class="field full"><label for="date">Treatment date</label><input id="date" name="date"
+                            type="date" required><span class="hint">The Co-60 calibration reference date is 23 May
+                            2018.</span></div>
+                    <div class="field full"><label for="area-override">Equivalent-square area override
+                            (cm²)</label><input id="area-override" name="areaOverride" type="number" min="0.001"
+                            max="1225" step="0.01" placeholder="Leave blank to calculate"><span class="hint">Use only if
+                            your approved workflow supplies a manual equivalent-square area.</span></div>
+                </div>
+                <div class="actions"><button type="submit">Calculate treatment time</button><button type="button"
+                        class="secondary" id="reset">Reset values</button></div>
+                <p class="error" id="error" role="alert" aria-live="polite"></p>
+            </form>
+
+            <section class="panel result-panel" aria-live="polite" aria-labelledby="result-title">
+                <div class="result-top">
+                    <p id="result-title">Treatment time</p>
+                    <div id="time" class="time">—</div>
+                    <p id="seconds" class="seconds">Enter inputs to calculate</p>
+                </div>
+                <div class="placeholder" id="placeholder">Calculated dosimetry values will appear here.</div>
+                <div class="results" id="results">
+                    <dl>
+                        <div class="row">
+                            <dt>Equivalent square</dt>
+                            <dd id="equivalent-square">—</dd>
+                        </div>
+                        <div class="row">
+                            <dt>Equivalent-square area</dt>
+                            <dd id="area">—</dd>
+                        </div>
+                        <div class="row">
+                            <dt>Percentage depth dose</dt>
+                            <dd id="pdd">—</dd>
+                        </div>
+                        <div class="row">
+                            <dt>Dose at dmax</dt>
+                            <dd id="dmax">—</dd>
+                        </div>
+                        <div class="row">
+                            <dt>Reference output</dt>
+                            <dd id="reference-output">—</dd>
+                        </div>
+                        <div class="row">
+                            <dt>Co-60 decay factor</dt>
+                            <dd id="decay">—</dd>
+                        </div>
+                        <div class="row">
+                            <dt>Output on treatment date</dt>
+                            <dd id="current-output">—</dd>
+                        </div>
+                    </dl>
+                    <p class="footnote">The lookup tables are embedded in this file. This page does not transmit entered
+                        values.</p>
+                </div>
+            </section>
+        </section>
+        <footer>Supported input range: fields 1–40 cm, depth 0.5–30 cm. Output calibration supports equivalent-square
+            areas from 25 to 1225 cm².</footer>
+    </main>
+    <script>
+        (() => {
+            const EQ_CSV = "WVxYLDAuNSwxLDIsMyw0LDUsNiw3LDgsOSwxMCwxMSwxMiwxMywxNCwxNSwxNiwxNywxOCwxOSwyMCwyMSwyMiwyMywyNCwyNSwyNiwyNywyOCwyOSwzMCwzMSwzMiwzMywzNCwzNSwzNiwzNywzOCwzOSw0MA0KMC41LDAuNTAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQoxLDAuNzAsMS4wMCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLA0KMiwwLjkwLDEuNDAsMi4wMCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQozLDEuMDAsMS42MCwyLjQwLDMuMDAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQo0LDEuMTAsMS43MCwyLjcwLDMuNDAsNC4wMCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLA0KNSwxLjIwLDEuODAsMi45MCwzLjgwLDQuNTAsNS4wMCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQo2LDEuMjAsMS45MCwzLjEwLDQuMTAsNC44MCw1LjUwLDYuMDAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQo3LDEuMjAsMi4wMCwzLjMwLDQuMzAsNS4xMCw1LjgwLDYuNTAsNy4wMCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLA0KOCwxLjIwLDIuMTAsMy40MCw0LjUwLDUuNDAsNi4yMCw2LjkwLDcuNTAsOC4wMCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQo5LDEuMzAsMi4xMCwzLjUwLDQuNjAsNS42MCw2LjUwLDcuMjAsNy45MCw4LjUwLDkuMDAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQoxMCwxLjMwLDIuMjAsMy42MCw0LjgwLDUuODAsNi43MCw3LjUwLDguMjAsOC45MCw5LjUwLDEwLjAwLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQoxMSwxLjMwLDIuMjAsMy43MCw0LjkwLDYuMDAsNi45MCw3LjgwLDguNTAsOS4zMCw5LjkwLDEwLjUwLDExLjAwLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwNCjEyLDEuMzAsMi4yMCwzLjcwLDUuMDAsNi4xMCw3LjEwLDguMDAsOC44MCw5LjYwLDEwLjMwLDEwLjkwLDExLjUwLDEyLjAwLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLA0KMTMsMS4zMCwyLjIwLDMuODAsNS4xMCw2LjIwLDcuMjAsOC4yMCw5LjEwLDkuOTAsMTAuNjAsMTEuMzAsMTEuOTAsMTIuNTAsMTMuMDAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwNCjE0LDEuMzAsMi4zMCwzLjgwLDUuMTAsNi4zMCw3LjQwLDguNDAsOS4zMCwxMC4xMCwxMC45MCwxMS42MCwxMi4zMCwxMi45MCwxMy41MCwxNC4wMCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQoxNSwxLjMwLDIuMzAsMy45MCw1LjIwLDYuNDAsNy41MCw4LjUwLDkuNTAsMTAuMzAsMTEuMjAsMTEuOTAsMTIuNjAsMTMuMzAsMTMuOTAsMTQuNTAsMTUuMDAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQoxNiwxLjMwLDIuMzAsMy45MCw1LjMwLDYuNTAsNy42MCw4LjYwLDkuNjAsMTAuNTAsMTEuNDAsMTIuMjAsMTIuOTAsMTMuNzAsMTQuMzAsMTQuOTAsMTUuNTAsMTYuMDAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwNCjE3LDEuMzAsMi4zMCwzLjkwLDUuMzAsNi41MCw3LjcwLDguODAsOS44MCwxMC43MCwxMS42MCwxMi40MCwxMy4yMCwxNC4wMCwxNC43MCwxNS4zMCwxNS45MCwxNi41MCwxNy4wMCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQoxOCwxLjMwLDIuMzAsMy45MCw1LjMwLDYuNjAsNy44MCw4LjkwLDkuOTAsMTAuOTAsMTEuODAsMTIuNjAsMTMuNTAsMTQuMzAsMTUuMDAsMTUuNzAsMTYuMzAsMTYuOTAsMTcuNTAsMTguMDAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQoxOSwxLjQwLDIuMzAsNC4wMCw1LjQwLDYuNjAsNy44MCw4LjkwLDEwLjEwLDExLjAwLDExLjkwLDEyLjgwLDEzLjcwLDE0LjUwLDE1LjMwLDE2LjAwLDE2LjcwLDE3LjMwLDE3LjkwLDE4LjUwLDE5LjAwLCwsLCwsLCwsLCwsLCwsLCwsLCwsDQoyMCwxLjQwLDIuMzAsNC4wMCw1LjQwLDYuNzAsNy45MCw5LjAwLDEwLjEwLDExLjEwLDEyLjEwLDEzLjAwLDEzLjkwLDE0LjcwLDE1LjUwLDE2LjMwLDE3LjAwLDE3LjcwLDE4LjMwLDE4LjkwLDE5LjUwLDIwLjAwLCwsLCwsLCwsLCwsLCwsLCwsLCwNCjIxLDEuNDAsMi40MCw0LjAwLDUuNDUsNi43NSw3Ljk1LDkuMDUsMTAuMTUsMTEuMjAsMTIuMjAsMTMuMTUsMTQuMDUsMTQuOTAsMTUuNzUsMTYuNTUsMTcuMzAsMTguMDAsMTguNjUsMTkuMzAsMTkuOTAsMjAuNTAsMjEuMDAsLCwsLCwsLCwsLCwsLCwsLCwsDQoyMiwxLjQwLDIuNDAsNC4wMCw1LjUwLDYuODAsOC4wMCw5LjEwLDEwLjIwLDExLjMwLDEyLjMwLDEzLjMwLDE0LjIwLDE1LjEwLDE2LjAwLDE2LjgwLDE3LjYwLDE4LjMwLDE5LjAwLDE5LjcwLDIwLjMwLDIwLjkwLDIxLjUwLDIyLjAwLCwsLCwsLCwsLCwsLCwsLCwsDQoyMywxLjQwLDIuNDAsNC4wMCw1LjUwLDYuODAsOC4wNSw5LjE1LDEwLjMwLDExLjM1LDEyLjQwLDEzLjQwLDE0LjM1LDE1LjI1LDE2LjE1LDE3LjAwLDE3LjgwLDE4LjU1LDE5LjMwLDIwLjAwLDIwLjY1LDIxLjMwLDIxLjkwLDIyLjUwLDIzLjAwLCwsLCwsLCwsLCwsLCwsLCwNCjI0LDEuNDAsMi40MCw0LjAwLDUuNTAsNi44MCw4LjEwLDkuMjAsMTAuNDAsMTEuNDAsMTIuNTAsMTMuNTAsMTQuNTAsMTUuNDAsMTYuMzAsMTcuMjAsMTguMDAsMTguODAsMTkuNjAsMjAuMzAsMjEuMDAsMjEuNzAsMjIuMzAsMjIuOTAsMjMuNTAsMjQuMDAsLCwsLCwsLCwsLCwsLCwsDQoyNSwxLjQwLDIuNDAsNC4wNSw1LjUwLDYuOTAsOC4xMCw5LjI1LDEwLjQ1LDExLjUwLDEyLjU1LDEzLjYwLDE0LjYwLDE1LjU1LDE2LjQ1LDE3LjM1LDE4LjIwLDE5LjA1LDE5Ljg1LDIwLjYwLDIxLjMwLDIyLjA1LDIyLjY3LDIzLjMwLDIzLjkwLDI0LjUwLDI1LjAwLCwsLCwsLCwsLCwsLCwsDQoyNiwxLjQwLDIuNDAsNC4xMCw1LjUwLDYuOTAsOC4xMCw5LjMwLDEwLjUwLDExLjYwLDEyLjYwLDEzLjcwLDE0LjcwLDE1LjcwLDE2LjYwLDE3LjUwLDE4LjQwLDE5LjMwLDIwLjEwLDIwLjkwLDIxLjYwLDIyLjQwLDIyLjc1LDIzLjcwLDI0LjMwLDI0LjkwLDI1LjUwLDI2LjAwLCwsLCwsLCwsLCwsLCwNCjI3LDEuNDAsMi40MCw0LjEwLDUuNjAsNi45MCw4LjE1LDkuMzUsMTAuNTAsMTEuNjUsMTIuNjUsMTMuNzUsMTQuNzUsMTUuNzUsMTYuNzAsMTcuNjUsMTguNTUsMTkuNDUsMjAuMzAsMjEuMTAsMjEuODUsMjIuNjUsMjMuMzUsMjQuMDUsMjQuNjgsMjUuMzAsMjUuOTAsMjYuNTAsMjcuMDAsLCwsLCwsLCwsLCwsDQoyOCwxLjQwLDIuNDAsNC4xMCw1LjUwLDYuOTAsOC4yMCw5LjQwLDEwLjUwLDExLjcwLDEyLjcwLDEzLjgwLDE0LjgwLDE1LjgwLDE2LjgwLDE3LjgwLDE4LjcwLDE5LjYwLDIwLjUwLDIxLjMwLDIyLjEwLDIyLjkwLDIzLjY1LDI0LjQwLDI1LjA1LDI1LjcwLDI2LjMwLDI2LjkwLDI3LjUwLDI4LjAwLCwsLCwsLCwsLCwsDQoyOSwxLjQwLDIuNDAsNC4xMCw1LjU1LDYuOTAsOC4yMCw5LjQwLDEwLjU1LDExLjcwLDEyLjc1LDEzLjg1LDE0LjkwLDE1LjkwLDE2LjkwLDE3LjkwLDE4LjgwLDE5Ljc1LDIwLjY1LDIxLjQ1LDIyLjMwLDIzLjEwLDIzLjg3LDI0LjY1LDI1LjM1LDI2LjA1LDI2LjY4LDI3LjMwLDI3LjkwLDI4LjUwLDI5LjAwLCwsLCwsLCwsLCwNCjMwLDEuNDAsMi40MCw0LjEwLDUuNjAsNi45MCw4LjIwLDkuNDAsMTAuNjAsMTEuNzAsMTIuODAsMTMuOTAsMTUuMDAsMTYuMDAsMTcuMDAsMTguMDAsMTguOTAsMTkuOTAsMjAuODAsMjEuNjAsMjIuNTAsMjMuMzAsMjQuMTAsMjQuOTAsMjUuNjUsMjYuNDAsMjcuMDUsMjcuNzAsMjguMzAsMjguOTAsMjkuNTAsMzAuMDAsLCwsLCwsLCwsDQozMSwxLjQwLDIuNDAsNC4xMCw1LjYwLDYuOTAsOC4yMCw5LjQwLDEwLjYwLDExLjc1LDEyLjg1LDEzLjk1LDE1LjAwLDE2LjA1LDE3LjA1LDE4LjA1LDE5LjAwLDIwLjAwLDIwLjkwLDIxLjc1LDIyLjY1LDIzLjUwLDIzLjgyLDI0LjE1LDI1LjQwLDI2LjY1LDI3LjM1LDI4LjA1LDI4LjY4LDI5LjMwLDI5LjkwLDMwLjUwLDMxLjAwLCwsLCwsLCwsDQozMiwxLjQwLDIuNDAsNC4xMCw1LjYwLDYuOTAsOC4yMCw5LjQwLDEwLjYwLDExLjgwLDEyLjkwLDE0LjAwLDE1LjAwLDE2LjEwLDE3LjEwLDE4LjEwLDE5LjEwLDIwLjEwLDIxLjAwLDIxLjkwLDIyLjgwLDIzLjcwLDI0LjU1LDI1LjQwLDI2LjE1LDI2LjkwLDI3LjY1LDI4LjQwLDI5LjA1LDI5LjcwLDMwLjMwLDMwLjkwLDMxLjUwLDMyLjAwLCwsLCwsLCwNCjMzLDEuNDAsMi40MCw0LjEwLDUuNjAsNi45MCw4LjIwLDkuNDUsMTAuNjUsMTEuODAsMTIuOTAsMTQuMDAsMTUuMDUsMTYuMTUsMTcuMTUsMTguMTUsMTkuMTAsMjAuMTUsMjEuMTAsMjIuMDAsMjIuOTUsMjMuODUsMjQuNzAsMjUuNTUsMjYuMzUsMjcuMTUsMjcuOTMsMjguNzAsMjkuNDAsMzAuMTAsMzAuNzAsMzEuMzAsMzEuOTAsMzIuNTAsMzMuMDAsLCwsLCwsDQozNCwxLjQwLDIuNDAsNC4xMCw1LjYwLDYuOTAsOC4yMCw5LjUwLDEwLjcwLDExLjgwLDEyLjkwLDE0LjAwLDE1LjEwLDE2LjIwLDE3LjIwLDE4LjIwLDE5LjIwLDIwLjIwLDIxLjIwLDIyLjEwLDIzLjEwLDI0LjAwLDI0Ljg1LDI1LjcwLDI2LjU1LDI3LjQwLDI4LjIwLDI5LjAwLDI5LjcwLDMwLjQwLDMxLjA1LDMxLjcwLDMyLjMwLDMyLjkwLDMzLjUwLDM0LjAwLCwsLCwsDQozNSwxLjQwLDIuNDAsNC4xMCw1LjYwLDYuOTAsOC4yMCw5LjUwLDEwLjcwLDExLjgwLDEyLjk1LDE0LjA1LDE1LjE1LDE2LjIwLDE3LjI1LDE4LjI1LDE5LjI1LDIwLjMwLDIxLjI1LDIyLjIwLDIzLjIwLDI0LjEwLDI0Ljk3LDI1Ljg1LDI2LjczLDI3LjYwLDI4LjQwLDI5LjIwLDI5Ljk1LDMwLjcwLDMxLjQwLDMyLjEwLDMyLjcwLDMzLjMwLDMzLjkwLDM0LjUwLDM1LjAwLCwsLCwNCjM2LDEuNDAsMi40MCw0LjEwLDUuNjAsNy4wMCw4LjIwLDkuNTAsMTAuNzAsMTEuODAsMTMuMDAsMTQuMTAsMTUuMjAsMTYuMjAsMTcuMzAsMTguMzAsMTkuMzAsMjAuNDAsMjEuMzAsMjIuMzAsMjMuMzAsMjQuMjAsMjUuMTAsMjYuMDAsMjYuOTAsMjcuODAsMjguNjAsMjkuNDAsMzAuMjAsMzEuMDAsMzEuNzAsMzIuNDAsMzMuMDUsMzMuNzAsMzQuMzAsMzQuOTAsMzUuNTAsMzYuMDAsLCwsDQozNywxLjQwLDIuNDAsNC4xMCw1LjYwLDcuMDAsOC4yNSw5LjUwLDEwLjcwLDExLjkwLDEzLjAwLDE0LjEwLDE1LjIwLDE2LjI1LDE3LjM1LDE4LjM1LDE5LjM1LDIwLjQ1LDIxLjQwLDIyLjM1LDIzLjM1LDI0LjMwLDI1LjIyLDI2LjE1LDI3LjA1LDI3Ljk1LDI4Ljc4LDI5LjYwLDMwLjQwLDMxLjIwLDMxLjk1LDMyLjcwLDMzLjQwLDM0LjEwLDM0LjcwLDM1LjMwLDM1LjkwLDM2LjUwLDM3LjAwLCwsDQozOCwxLjQwLDIuNDAsNC4xMCw1LjYwLDcuMDAsOC4zMCw5LjUwLDEwLjcwLDExLjkwLDEzLjAwLDE0LjEwLDE1LjIwLDE2LjMwLDE3LjQwLDE4LjQwLDE5LjQwLDIwLjUwLDIxLjUwLDIyLjQwLDIzLjQwLDI0LjQwLDI1LjM1LDI2LjMwLDI3LjIwLDI4LjEwLDI4Ljk1LDI5LjgwLDMwLjYwLDMxLjQwLDMyLjIwLDMzLjAwLDMzLjcwLDM0LjQwLDM1LjA1LDM1LjcwLDM2LjMwLDM2LjkwLDM3LjUwLDM4LjAwLCwNCjM5LDEuNDAsMi40MCw0LjEwLDUuNjAsNy4wMCw4LjMwLDkuNTAsMTAuNzAsMTEuOTAsMTMuMDAsMTQuMTAsMTUuMjAsMTYuMzAsMTcuNDAsMTguNDUsMTkuNDUsMjAuNTAsMjEuNTAsMjIuNTAsMjMuNDUsMjQuNDUsMjUuNDAsMjYuMzUsMjcuMjgsMjguMjAsMjkuMDgsMjkuOTUsMzAuNzgsMzEuNjAsMzIuNDMsMzMuMjUsMzMuOTgsMzQuNzAsMzUuNDAsMzYuMTAsMzYuNzAsMzcuMzAsMzcuOTAsMzguNTAsMzkuMDAsDQo0MCwxLjQwLDIuNDAsNC4xMCw1LjYwLDcuMDAsOC4zMCw5LjUwLDEwLjcwLDExLjkwLDEzLjAwLDE0LjEwLDE1LjIwLDE2LjMwLDE3LjQwLDE4LjUwLDE5LjUwLDIwLjUwLDIxLjUwLDIyLjYwLDIzLjUwLDI0LjUwLDI1LjQ1LDI2LjQwLDI3LjM1LDI4LjMwLDI5LjIwLDMwLjEwLDMwLjk1LDMxLjgwLDMyLjY1LDMzLjUwLDM0LjI1LDM1LjAwLDM1LjcwLDM2LjQwLDM3LjA1LDM3LjcwLDM4LjMwLDM4LjkwLDM5LjUwLDQwLjAwDQo=";
+            const PDD_CSV = "U3FcRCwwLjUsMSwyLDMsNCw1LDYsNyw4LDksMTAsMTEsMTIsMTMsMTQsMTUsMTYsMTcsMTgsMTksMjAsMjEsMjIsMjQsMjYsMjgsMzANCjE2LDEwMCw5Ny4yMCw5MS40MCw4NS40MCw3OS43MCw3My45MCw2OC40MCw2My4zMCw1OC41MCw1My45MCw0OS43MCw0NS45MCw0Mi40MCwzOS4xMCwzNi4xMCwzMy4yMCwzMC44MCwyOC4zMCwyNi4yMCwyNC4xMCwyMi4yMCwyMC42MCwxOS4wMCwxNi4yMCwxMy44MCwxMS4zMCwxMC4xMA0KMjUsMTAwLDk3LjUwLDkyLjEwLDg2LjMwLDgwLjcwLDc1LjIwLDY5LjcwLDY0LjcwLDU5LjkwLDU1LjUwLDUxLjIwLDQ3LjQwLDQzLjgwLDQwLjQwLDM3LjMwLDM0LjUwLDMxLjkwLDI5LjUwLDI3LjMwLDI1LjEwLDIzLjIwLDIxLjU1LDE5LjkwLDE3LjAwLDE0LjUwLDEyLjUwLDEwLjcwDQozNiwxMDAsOTcuNzAsOTIuNjAsODcuMDAsODEuNjAsNzYuMjAsNzAuODAsNjYuMDAsNjEuMjAsNTYuMzAsNTIuNTAsNDguNzAsNDUuMDAsNDEuNjAsMzguNzAsMzUuNzAsMzMuMDAsMzAuNTAsMjguMzAsMjYuMTAsMjQuMTAsMjIuNDAsMjAuNzAsMTcuNzAsMTUuMjAsMTMuMTAsMTEuMjANCjQ5LDEwMCw5Ny44MCw5My4wMCw4Ny42MCw4Mi4zMCw3Ny4xMCw3MS45MCw2Ny4wMCw2Mi4zMCw1Ny45MCw1My44MCw0OS4zMCw0Ni4yMCw0Mi44MCwzOS43MCwzNi43MCwzNC4wMCwzMS41MCwyOS4zMCwyNy4xMCwyNS4wMCwyMy4yNSwyMS41MCwxOC41MCwxNS45MCwxMy44MCwxMS44MA0KNjQsMTAwLDk3LjkwLDkzLjIwLDg4LjAwLDgyLjgwLDc3LjgwLDcyLjYwLDY3LjkwLDYzLjIwLDU4LjgwLDU0LjgwLDUwLjcwLDQ3LjIwLDQzLjgwLDQwLjcwLDM3LjYwLDM1LjAwLDMyLjUwLDMwLjIwLDI4LjAwLDI1LjgwLDI0LjA1LDIyLjMwLDE5LjIwLDE2LjYwLDE0LjQwLDEyLjMwDQo4MSwxMDAsOTguMDAsOTMuNDAsODguNDAsODMuMjAsNzguMzAsNzMuMzAsNjguNjAsNjQuMDAsNTkuNzAsNTUuNzAsNTEuNjAsNDguMTAsNDQuNzAsNDEuNjAsMzguNTAsMzUuOTAsMzMuMzAsMzAuOTAsMjguODAsMjYuNjAsMjQuODAsMjMuMDAsMTkuOTAsMTcuMjAsMTQuOTAsMTIuODANCjEwMCwxMDAsOTguMTAsOTMuNzAsODguNzAsODMuNzAsNzguODAsNzMuOTAsNjkuMzAsNjQuNzAsNjAuNTAsNTYuNDAsNTIuMzAsNDguODAsNDUuNDAsNDIuMzAsMzkuNDAsMzYuNjAsMzQuMTAsMzEuNzAsMjkuNTAsMjcuNDAsMjUuMzAsMjMuMjAsMjAuNTAsMTcuODAsMTUuNDAsMTMuNTANCjE0NCwxMDAsOTguMjAsOTMuOTAsODkuMTAsODQuMzAsNzkuNTAsNzQuOTAsNzAuMzAsNjUuODAsNjEuNzAsNTcuNzAsNTMuODAsNTAuMzAsNDcuMDAsNDMuNzAsNDAuODAsMzguMTAsMzUuNTAsMzMuMTAsMzAuODAsMjguNzAsMjYuODUsMjUuMDAsMjEuNzAsMTguOTAsMTYuNDAsMTQuMjANCjIyNSwxMDAsOTguMzAsOTQuMTAsODkuNTAsODQuOTAsODAuMzAsNzUuOTAsNzEuNTAsNjcuMTAsNjMuMDAsNTkuMjAsNTUuMzAsNTEuOTAsNDguNjAsNDUuNDAsNDIuNTAsMzkuNzAsMzcuMTAsMzQuNzAsMzIuNDAsMzAuMjAsMjguMzUsMjYuNTAsMjMuMTAsMjAuMjAsMTcuNzAsMTUuNDANCjQwMCwxMDAsOTguMzAsOTQuMzAsOTAuMTAsODUuNjAsODEuMzAsNzYuOTAsNzIuNjAsNjguNjAsNjQuNjAsNjAuODAsNTcuMjAsNTMuNzAsNTAuNTAsNDcuNDAsNDQuNTAsNDEuODAsMzkuMjAsMzYuNzAsMzQuNDAsMzIuMjAsMzAuMzAsMjguNDAsMjQuOTAsMjEuOTAsMTkuMzAsMTcuMDANCjYyNSwxMDAsOTguNDAsOTQuNTAsOTAuMzAsODYuMDAsODEuNzAsNzcuNTAsNzMuMzAsNjkuNTAsNjUuNjAsNjEuOTAsNTguMzAsNTUuMDAsNTEuODAsNDguNzAsNDUuOTAsNDMuMjAsNDAuNTAsMzguMTAsMzUuODAsMzMuNTAsMzEuNjUsMjkuODAsMjYuMjAsMjMuMjAsMjAuNjAsMTguMjANCjkwMCwxMDAsOTguNTAsOTQuNzAsOTAuNTAsODYuMzAsODIuMTAsNzguMTAsNzMuOTAsNzAuMTAsNjYuMzAsNjIuNjAsNTkuMTAsNTUuODAsNTIuODAsNDkuODAsNDYuOTAsNDQuMjAsNDEuNjAsMzkuMjAsMzYuOTAsMzQuNzAsMzIuNzUsMzAuODAsMjcuMzAsMjQuMjAsMjEuNTAsMTkuMDANCjEyMjUsMTAwLDk4LjUwLDk0LjgwLDkwLjYwLDg2LjUwLDgyLjQwLDc4LjQwLDc0LjMwLDcwLjUwLDY2LjMwLDYzLjIwLDU5LjgwLDU2LjUwLDUzLjQwLDUwLjUwLDQ3LjYwLDQ1LjAwLDQyLjQwLDM5LjkwLDM3LjcwLDM1LjUwLDMzLjUwLDMxLjUwLDI4LjEwLDI0LjkwLDIyLjEwLDE5LjYwDQo=";
+            const OP_CSV = "RlMoY20yKSxFcS5TcS4sT3V0cHV0DQo1eDUsMjUsMjQ1LjM2MDE0NDczNjE2Mjc3DQo4eDgsNjQsMjU0LjAxNDQ5MDM5OTU0MzQzDQoxMHgxMCwxMDAsMjU5LjcwNTMyNjc0MDUwMDgNCjEyeDEyLDE0NCwyNjQuNDg3MzE2NTA4MjM5NjQNCjE1eDE1LDIyNSwyNzAuNjAwMTc1MDQ5NDY0OQ0KMTh4MTgsMzI0LDI3NS41Mzk2Mjg4MjIzMTkyDQoyMHgyMCw0MDAsMjc3LjY0MDA2MDYzMTY0MQ0KMjV4MjUsNjI1LDI4Mi41ODU5MDgwMTcxNTQ3DQozMHgzMCw5MDAsMjgzLjQ5MDczNDc1NTQxMjg2DQozNXgzNSwxMjI1LDI4My4wMjY5MzU0NzM1OTA1DQo=";
+            const form = document.getElementById("calculator-form");
+            const error = document.getElementById("error");
+            const results = document.getElementById("results");
+            const placeholder = document.getElementById("placeholder");
+            const number = new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 });
+            const today = new Date(); document.getElementById("date").value = today.toISOString().slice(0, 10);
+
+            const parseCsv = text => text.trim().split(/\r?\n/).map(line => line.split(","));
+            const decode = value => new TextDecoder().decode(Uint8Array.from(atob(value), char => char.charCodeAt(0)));
+            const eqRows = parseCsv(decode(EQ_CSV));
+            const eqHeaders = eqRows[0].slice(1).map(Number);
+            const eqTable = new Map(eqRows.slice(1).map(row => [Number(row[0]), new Map(row.slice(1).map((value, index) => [eqHeaders[index], value === "" ? null : Number(value)]))]));
+            const pddRows = parseCsv(decode(PDD_CSV));
+            const depths = pddRows[0].slice(1).map(Number);
+            const pddTable = pddRows.slice(1).map(row => ({ area: Number(row[0]), values: row.slice(1).map(Number) }));
+            const opTable = parseCsv(decode(OP_CSV)).slice(1).map(row => ({ area: Number(row[1]), output: Number(row[2]) }));
+
+            const interpolation = (x0, y0, x1, y1, x) => x0 === x1 ? y0 : y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+            const bracket = (values, value) => {
+                if (value < values[0] || value > values.at(-1)) throw new Error(`Value must be between ${values[0]} and ${values.at(-1)}.`);
+                return [values.reduce((last, current, index) => current <= value ? index : last, 0), values.findIndex(current => current >= value)];
+            };
+            const valueAt = (table, key) => table.get(key);
+            const getEquivalentSquare = (x, y) => {
+                const smaller = Math.floor(Math.min(x, y));
+                const larger = Math.floor(Math.max(x, y));
+                const result = valueAt(eqTable, smaller)?.get(larger);
+                if (!Number.isFinite(result)) throw new Error("This field-size pair is outside the supported equivalent-square lookup table.");
+                return result;
+            };
+            const getPdd = (area, depth) => {
+                const areas = pddTable.map(row => row.area);
+                const [a0, a1] = bracket(areas, area);
+                const [d0, d1] = bracket(depths, depth);
+                const lower = interpolation(depths[d0], pddTable[a0].values[d0], depths[d1], pddTable[a0].values[d1], depth);
+                const upper = interpolation(depths[d0], pddTable[a1].values[d0], depths[d1], pddTable[a1].values[d1], depth);
+                return interpolation(areas[a0], lower, areas[a1], upper, area);
+            };
+            const getOutput = area => {
+                const areas = opTable.map(row => row.area);
+                const [i0, i1] = bracket(areas, area);
+                return interpolation(areas[i0], opTable[i0].output, areas[i1], opTable[i1].output, area);
+            };
+            const set = (id, value) => document.getElementById(id).textContent = value;
+            const calculate = () => {
+                const fieldX = Number(form.fieldX.value), fieldY = Number(form.fieldY.value), depth = Number(form.depth.value), dose = Number(form.dose.value);
+                const overrideText = form.areaOverride.value.trim(), override = overrideText === "" ? null : Number(overrideText);
+                const treatmentDate = new Date(`${form.date.value}T00:00:00`);
+                if (![fieldX, fieldY, depth, dose].every(Number.isFinite) || !form.date.value) throw new Error("Complete every required input.");
+                if (fieldX < 1 || fieldX > 40 || fieldY < 1 || fieldY > 40) throw new Error("Field dimensions must be from 1 to 40 cm.");
+                if (depth < 0.5 || depth > 30) throw new Error("Depth must be from 0.5 to 30 cm.");
+                if (dose <= 0) throw new Error("Prescribed dose must be greater than zero.");
+                if (override !== null && (!Number.isFinite(override) || override <= 0)) throw new Error("Equivalent-square area override must be greater than zero.");
+                const equivalentSquare = getEquivalentSquare(fieldX, fieldY);
+                const area = override ?? equivalentSquare ** 2;
+                const pdd = getPdd(area, depth), referenceOutput = getOutput(area);
+                const calibrationDate = new Date("2018-05-23T00:00:00");
+                const days = Math.round((treatmentDate - calibrationDate) / 86400000);
+                const decay = Math.exp(-(0.693 / (5.26 * 365)) * days);
+                const output = referenceOutput * decay;
+                const dmax = dose / (pdd / 100);
+                const minutes = dmax / output;
+                set("time", `${number.format(minutes)} min`); set("seconds", `${number.format(minutes * 60)} seconds`);
+                set("equivalent-square", `${number.format(equivalentSquare)} cm`);
+                set("area", `${number.format(area)} cm²${override !== null ? " (override)" : ""}`);
+                set("pdd", `${number.format(pdd)} %`); set("dmax", `${number.format(dmax)} cGy`);
+                set("reference-output", `${number.format(referenceOutput)} cGy/min`); set("decay", decay.toFixed(6));
+                set("current-output", `${number.format(output)} cGy/min`);
+                error.textContent = ""; placeholder.hidden = true; results.classList.add("visible");
+            };
+            form.addEventListener("submit", event => { event.preventDefault(); try { calculate(); } catch (message) { error.textContent = message.message; } });
+            document.getElementById("reset").addEventListener("click", () => { form.reset(); form.fieldX.value = 10; form.fieldY.value = 10; form.depth.value = 7; form.dose.value = 100; document.getElementById("date").value = today.toISOString().slice(0, 10); error.textContent = ""; results.classList.remove("visible"); placeholder.hidden = false; set("time", "—"); set("seconds", "Enter inputs to calculate"); });
+        })();
+    </script>
+</body>
+
+</html>
